@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Estadistika</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Font: Arizonia -->
+    <link href="https://fonts.googleapis.com/css2?family=Arizonia&display=swap" rel="stylesheet">
+
+    <style>
+        .header-bar {
+            background-color: #cfe9ff;
+            padding: 20px 0;
+        }
+        .header-title {
+            font-family: 'Arizonia', cursive;
+            font-size: 2.5rem;
+            color: #0d3b66;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+<!-- Header -->
+<div class="header-bar shadow-sm">
+    <div class="container text-center">
+        <div class="header-title">Estadistika</div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9 col-sm-12">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+
+                    <h5 class="text-center mb-2 fw-bold">
+                        Upload Research Dataset
+                    </h5>
+                    <p class="text-center text-muted mb-4">
+                        Free analysis limit: <span id="usageCount">0</span>/5
+                    </p>
+
+                    <form id="analyzeForm" action="{% url 'analyze' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Title of Study</label>
+                            <input type="text" name="title" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Objective</label>
+                            <textarea name="objective" class="form-control" rows="3" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Problem Statement</label>
+                            <textarea name="problem" class="form-control" rows="3" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Variable Name</label>
+                            <input type="text" name="variable" class="form-control" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Excel File</label>
+                            <input type="file" name="file" class="form-control" accept=".xls,.xlsx" required>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                Analyze Data
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Subscription Modal -->
+<div class="modal fade" id="subscriptionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Upgrade Required</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body text-center">
+                <p class="fw-semibold">
+                    You have reached the free analysis limit (5).
+                </p>
+                <p class="mb-3">
+                    Subscribe to continue using <strong>Estadistika</strong>.
+                </p>
+
+                <div class="border rounded p-3 mb-3">
+                    <h6 class="fw-bold mb-2">GCash Payment</h6>
+                    <p class="mb-1">GCash Number:</p>
+                    <p class="fw-bold fs-5">09XX-XXX-XXXX</p>
+                    <p class="text-muted small">
+                        After payment, your access will be activated.
+                    </p>
+                </div>
+
+                <button class="btn btn-success w-100" data-bs-dismiss="modal">
+                    I Understand
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const MAX_USAGE = 5;
+    let usage = localStorage.getItem("estadistika_usage");
+
+    if (!usage) {
+        usage = 0;
+        localStorage.setItem("estadistika_usage", usage);
+    }
+
+    document.getElementById("usageCount").innerText = usage;
+
+    document.getElementById("analyzeForm").addEventListener("submit", function (e) {
+        if (parseInt(usage) >= MAX_USAGE) {
+            e.preventDefault();
+            const modal = new bootstrap.Modal(document.getElementById("subscriptionModal"));
+            modal.show();
+        } else {
+            usage++;
+            localStorage.setItem("estadistika_usage", usage);
+        }
+    });
+</script>
+
+</body>
+</html>
